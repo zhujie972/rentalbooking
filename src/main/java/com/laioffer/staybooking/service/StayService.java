@@ -19,6 +19,7 @@ public class StayService {
     private StayRepository stayRepository;
     private ImageStorageService imageStorageService;
 
+
     @Autowired
     public StayService(StayRepository stayRepository, ImageStorageService imageStorageService) {
         this.stayRepository = stayRepository;

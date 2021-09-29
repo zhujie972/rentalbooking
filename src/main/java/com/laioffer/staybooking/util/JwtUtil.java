@@ -10,7 +10,21 @@ import java.util.Date;
 import java.util.HashMap;
 
 import io.jsonwebtoken.Claims;
+import com.laioffer.staybooking.model.Authority;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.web.filter.OncePerRequestFilter;
 
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 // 帮助生成、解析 Token 的class
 
 @Component
@@ -31,7 +45,7 @@ public class JwtUtil {
 
     private Claims extractClaims(String token) {
         //获取整个对象的body，然后用这个object读取信息， 看下面2个方法
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody(); // parseClaimJws 和 parseClaimJwt 是什么区别？
     }
 
     public String extractUsername(String token) {

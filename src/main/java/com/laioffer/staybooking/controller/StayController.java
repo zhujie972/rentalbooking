@@ -10,7 +10,8 @@ import com.laioffer.staybooking.model.User;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-
+import java.security.Principal;
+import java.util.List;
 
 @RestController
 public class StayController {
@@ -21,9 +22,14 @@ public class StayController {
         this.stayService = stayService;
     }
 
+
+//    @GetMapping(value = "/stays")
+//    public List<Stay> listStays(@RequestParam(name = "host") String hostName) {
+//        return stayService.findByHost(hostName);
+//    }
     @GetMapping(value = "/stays")
-    public List<Stay> listStays(@RequestParam(name = "host") String hostName) {
-        return stayService.findByHost(hostName);
+    public List<Stay> listStays(Principal principal) {
+        return stayService.findByHost(principal.getName());
     }
 
     @GetMapping(value = "/stays/{stayId}")
@@ -35,24 +41,40 @@ public class StayController {
 //    public void addStay(@RequestBody Stay stay) {
 //        stayService.add(stay);
 //    }
+//    @PostMapping("/stays")
+//    public void addStay(
+//            @RequestParam("name") String name,
+//            @RequestParam("address") String address,
+//            @RequestParam("description") String description,
+//            @RequestParam("host") String host,
+//            @RequestParam("guest_number") int guestNumber,
+//            @RequestParam("images") MultipartFile[] images) {
+//
+//        Stay stay = new Stay.Builder().setName(name)
+//                .setAddress(address)
+//                .setDescription(description)
+//                .setGuestNumber(guestNumber)
+//                .setHost(new User.Builder().setUsername(host).build())
+//                .build();
+//        stayService.add(stay, images);
+//    }
     @PostMapping("/stays")
     public void addStay(
             @RequestParam("name") String name,
             @RequestParam("address") String address,
             @RequestParam("description") String description,
-            @RequestParam("host") String host,
             @RequestParam("guest_number") int guestNumber,
-            @RequestParam("images") MultipartFile[] images) {
+            @RequestParam("images") MultipartFile[] images,
+            Principal principal) {
 
         Stay stay = new Stay.Builder().setName(name)
                 .setAddress(address)
                 .setDescription(description)
                 .setGuestNumber(guestNumber)
-                .setHost(new User.Builder().setUsername(host).build())
+                .setHost(new User.Builder().setUsername(principal.getName()).build())
                 .build();
         stayService.add(stay, images);
     }
-
 
     @DeleteMapping("/stays/{stayId}")
     public void deleteStay(@PathVariable Long stayId) {
