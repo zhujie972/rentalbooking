@@ -33,4 +33,4 @@ build/
 .vscode/
 
 ## resource folder ##
-/src/main/resources/**
+src/main/resources/**
