@@ -1,5 +1,6 @@
 package com.laioffer.staybooking.service;
 
+import com.laioffer.staybooking.exception.StayDeleteException;
 import com.laioffer.staybooking.model.*;
 import com.laioffer.staybooking.repository.StayRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,29 +12,41 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
-
+import com.laioffer.staybooking.repository.LocationRepository;
+import com.laioffer.staybooking.repository.ReservationRepository;
 @Service
 public class StayService {
 
     private StayRepository stayRepository;
     private ImageStorageService imageStorageService;
-
+    private LocationRepository locationRepository;
+    private GeoEncodingService geoEncodingService;
+    private ReservationRepository reservationRepository;
 
     @Autowired
-    public StayService(StayRepository stayRepository, ImageStorageService imageStorageService) {
+    public StayService(StayRepository stayRepository, LocationRepository locationRepository, ReservationRepository reservationRepository, ImageStorageService imageStorageService, GeoEncodingService geoEncodingService) {
         this.stayRepository = stayRepository;
+        this.locationRepository = locationRepository;
         this.imageStorageService = imageStorageService;
+        this.geoEncodingService = geoEncodingService;
+        this.reservationRepository = reservationRepository;
     }
+
 
     public Stay findByID(Long stayId) {
         return stayRepository.findById(stayId).orElse(null);
 //        return stayRepository.getById(StayID);
     }
+//lecture 33 修改 ， 因为有可能reserve 了
 
-    public void delete(Long stayId) {
+    public void delete(Long stayId) throws StayDeleteException {
+        List<Reservation> reservations = reservationRepository.findByStayAndCheckoutDateAfter(new Stay.Builder().setId(stayId).build(), LocalDate.now());
+        if (reservations != null && reservations.size() > 0) {
+            throw new StayDeleteException("Cannot delete stay with active reservation");
+        }
         stayRepository.deleteById(stayId);
     }
+
 
     public List<Stay> findByHost(String username) {
         return stayRepository.findByHost(new User.Builder()
@@ -75,6 +88,9 @@ public class StayService {
 
 
         stayRepository.save(stay); //stay 表格里 oneToMany 有cascade all， 只要更新stay 会同时存另外一个表里对应的
+
+        Location location = geoEncodingService.getLatLng(stay.getId(), stay.getAddress());
+        locationRepository.save(location);
     }
 
 }

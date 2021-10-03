@@ -35,6 +35,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //暂时强制打开
                 .antMatchers("/stays").hasAuthority("ROLE_HOST")
                 .antMatchers("/stays/*").hasAuthority("ROLE_HOST")
+                .antMatchers("/search").hasAuthority("ROLE_GUEST")
+                // both guest and host can access/reservations/* ， 但是只有guest 可以在/reservation 操作
+                .antMatchers("/reservations").hasAuthority("ROLE_GUEST")
+                .antMatchers("/reservations/*").hasAuthority("ROLE_GUEST")
                 .anyRequest().authenticated()
                 .and()
                 .csrf()

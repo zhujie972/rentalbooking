@@ -12,14 +12,17 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.security.Principal;
 import java.util.List;
-
+import com.laioffer.staybooking.model.Reservation;
+import com.laioffer.staybooking.service.ReservationService;
 @RestController
 public class StayController {
     private StayService stayService;
+    private ReservationService reservationService;
 
     @Autowired
-    public StayController(StayService stayService) {
+    public StayController(StayService stayService, ReservationService reservationService) {
         this.stayService = stayService;
+        this.reservationService = reservationService;
     }
 
 
@@ -74,6 +77,11 @@ public class StayController {
                 .setHost(new User.Builder().setUsername(principal.getName()).build())
                 .build();
         stayService.add(stay, images);
+    }
+
+    @GetMapping(value = "/stays/reservations/{stayId}")
+    public List<Reservation> listReservations(@PathVariable Long stayId, Principal principal) {
+        return reservationService.listByStay(stayId);
     }
 
     @DeleteMapping("/stays/{stayId}")

@@ -27,6 +27,7 @@ public class SearchService {
 
     public List<Stay> search(int guestNumber, LocalDate checkinDate, LocalDate checkoutDate, double lat, double lon, String distance) {
         List<Long> stayIds = locationRepository.searchByDistance(lat, lon, distance);
+        //Long和long 有影响吗
         long duration = Duration.between(checkinDate.atStartOfDay(), checkoutDate.atStartOfDay()).toDays();
 
         List<Long> filteredStayIds = stayAvailabilityRepository.findByDateBetweenAndStateIsAvailable(stayIds, checkinDate, checkoutDate.minusDays(1), duration);
